@@ -12,27 +12,14 @@ class UnaryService(pb2_grpc.UnaryServicer):
 
     def GetServerResponse(self, request, context):
 
-        # get the string from the incoming request
-        message = request.message
+        result = f'Hello I am up and running received {request.message.key} : {request.message.value}'
 
-        import json
-        
-        j = json.loads(message)
-        r = str(j['a'])
-
-
-        result = f'Hello I am up and running received "{message}"'
-        result = {
-          'message': r, 
-          'received': True
-        }
-#        result = {
-#          'message': result, 
-#          'received': True
-#        }
-
-        return pb2.MessageResponse(**result)
-
+        for i in range(2401):
+            reply = {
+                'message': "Hello",
+                'value': i
+            }
+            yield pb2.MessageResponse(**reply)
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
@@ -42,7 +29,6 @@ def serve():
     server.add_insecure_port('[::]:50051')
     server.start()
     server.wait_for_termination()
-
 
 if __name__ == '__main__':
     serve()

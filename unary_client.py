@@ -3,6 +3,9 @@ import json
 import unary.unary_pb2_grpc as pb2_grpc
 import unary.unary_pb2 as pb2
 
+import time
+import numpy as np
+
 
 class UnaryClient(object):
     """
@@ -24,14 +27,20 @@ class UnaryClient(object):
         """
         Client function to call the rpc for GetServerResponse
         """
-        message = pb2.Message(message=message)
-        print(f'{message}')
-        return self.stub.GetServerResponse(message)
 
+        message = pb2.Message(message=message)
+
+        values = []
+        replies = self.stub.GetServerResponse(message)
+        for reply in replies:
+            values.append(reply.value)
+
+        return values
 
 if __name__ == '__main__':
     client = UnaryClient()
-    #result = client.get_url(message="Hello Server you there?")
-    result = client.get_url(message=json.dumps({'a':1, 'b':2}))
-    
-    print(f'{result}')
+    point = pb2.Point(key="A", value=2)
+    start = time.time()
+    data = client.get_url(message=point)
+
+    print(time.time() - start)
